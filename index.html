@@ -46,6 +46,7 @@ button:hover{ transform:scale(1.05); box-shadow:0 0 15px #0ff; }
   </ul>
 </div>
 
+<!-- Google Actions Alarm Sound -->
 <audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto" loop></audio>
 
 <script>
@@ -86,11 +87,11 @@ function startReminder(){
 }
 
 function startAlarm(){
-    ringtone.currentTime=0;
-    ringtone.volume=1.0;
-    ringtone.loop=true;
-    ringtone.play().catch(e=>console.log("Audio blocked until user interaction",e));
-    restartBtn.style.display="inline-block";
+    ringtone.currentTime = 0;
+    ringtone.volume = 1.0; // MAX volume
+    ringtone.loop = true;
+    ringtone.play().catch(e => console.log("Audio blocked until user interaction", e));
+    restartBtn.style.display = "inline-block";
 
     if(Notification.permission==="granted"){
         notificationInterval=setInterval(()=>{
