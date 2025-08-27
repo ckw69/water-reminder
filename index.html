@@ -50,7 +50,7 @@
       font-size: 3rem;
       color: #00f0ff;
       margin: 0;
-      transition: color 0.3s;
+      transition: color 0.3s, text-shadow 0.3s;
     }
 
     .timer {
@@ -95,11 +95,14 @@
       cursor: pointer;
       color: #fff;
       background: linear-gradient(45deg, #00bfff, #0077cc);
-      transition: all 0.3s;
+      transition: all 0.3s, box-shadow 0.3s;
       animation: fadeIn 2s ease;
     }
 
-    button:hover { background: linear-gradient(45deg, #0077cc, #00bfff); transform: scale(1.05); }
+    button:hover { 
+      background: linear-gradient(45deg, #0077cc, #00bfff); 
+      transform: scale(1.05); 
+    }
 
     #stopBtn { background: linear-gradient(45deg, #ff4c4c, #cc0000); display: none; }
 
@@ -108,7 +111,7 @@
       color: #ffffff;
       margin-top: 10px;
       animation: fadeIn 2s ease;
-      transition: color 0.3s;
+      transition: color 0.3s, text-shadow 0.3s;
     }
 
     /* Top buttons */
@@ -119,31 +122,35 @@
       font-size: 0.9rem;
       border-radius: 8px;
       color: white;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
     }
-    #darkModeBtn { right: 20px; background: linear-gradient(45deg, #444, #222); }
-    #notifyBtn { left: 20px; background: linear-gradient(45deg, #444, #222); }
+    #darkModeBtn { right: 20px; background: #222; }
+    #notifyBtn { left: 20px; background: #222; }
 
-    /* Dark mode */
+    /* Dark mode - 100% black */
     .dark-mode {
-      background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e) !important;
+      background: #000 !important;
       color: #fff;
-      animation: darkBgAnimation 30s ease-in-out infinite alternate;
+      animation: none;
     }
-    .dark-mode .container { background: rgba(0,0,0,0.6); }
-    .dark-mode input[type="number"] { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 0 5px #00f0ff50; }
-    .dark-mode button { background: linear-gradient(45deg, #555, #333); box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
-    .dark-mode button:hover { background: linear-gradient(45deg, #333, #555); }
-    .dark-mode #darkModeBtn, .dark-mode #notifyBtn { background: linear-gradient(45deg, #555, #333); }
-    .dark-mode .timer { color: #00f0ff; text-shadow: 0 0 10px #00f0ff; }
-    .dark-mode h1 { color: #00e5ff; text-shadow: 0 0 8px #00e5ff; }
-    .dark-mode .status { color: #a0eaff; }
-
-    @keyframes darkBgAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .dark-mode .container { background: #111; }
+    .dark-mode input[type="number"] { background: #222; color: #0ff; box-shadow: 0 0 5px #0ff50; }
+    .dark-mode button { 
+      background: #333; 
+      box-shadow: 0 2px 6px rgba(0,255,255,0.3);
     }
+    .dark-mode button:hover { 
+      background: #555; 
+      transform: scale(1.05); 
+      box-shadow: 0 0 15px #0ff; 
+    }
+    .dark-mode #darkModeBtn:hover, .dark-mode #notifyBtn:hover {
+      box-shadow: 0 0 12px #0ff;
+    }
+    .dark-mode #darkModeBtn, .dark-mode #notifyBtn { background: #222; }
+    .dark-mode .timer { color: #0ff; text-shadow: 0 0 10px #0ff; }
+    .dark-mode h1 { color: #0ff; text-shadow: 0 0 8px #0ff; }
+    .dark-mode .status { color: #0ff; }
 
   </style>
 </head>
@@ -219,34 +226,4 @@
         document.title = "💧 Drink Water Now!";
         return;
       }
-      let seconds = Math.floor((remaining/1000)%60);
-      let minutes = Math.floor((remaining/1000/60)%60);
-      let hours = Math.floor((remaining/(1000*60*60))%24);
-      document.getElementById('timer').innerText = `Next reminder in ${hours}h ${minutes}m ${seconds}s.`;
-      document.title = `💧 ${hours}h ${minutes}m ${seconds}s left`;
-    }
-
-    function stopAlarm(){
-      ringtone.pause();
-      ringtone.currentTime = 0;
-      stopBtn.style.display = "none";
-      if(activeNotification) activeNotification.close();
-    }
-
-    function toggleDarkMode(){
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
-    }
-
-    function requestNotification(){
-      if(Notification.permission !== "granted"){
-        Notification.requestPermission().then(permission=>{
-          alert(permission==="granted"?"Notifications enabled!":"Notifications denied!");
-        });
-      } else {
-        alert("Notifications already granted.");
-      }
-    }
-  </script>
-</body>
-</html>
+      let seconds = Math.floor((remaining/1000
