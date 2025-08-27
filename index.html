@@ -17,6 +17,7 @@
       margin: 0;
       overflow: hidden;
       animation: bgAnimation 20s ease-in-out infinite alternate;
+      transition: background 0.3s, color 0.3s;
     }
 
     @keyframes bgAnimation {
@@ -36,6 +37,8 @@
       align-items: center;
       text-align: center;
       animation: fadeIn 2s ease;
+      position: relative;
+      transition: background 0.3s;
     }
 
     @keyframes fadeIn {
@@ -47,24 +50,21 @@
       font-size: 3rem;
       color: #00f0ff;
       margin: 0;
-      animation: textGlow 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes textGlow {
-      from { text-shadow: 0 0 10px #00f0ff; }
-      to { text-shadow: 0 0 25px #00f0ff; }
+      transition: color 0.3s;
     }
 
     .timer {
       font-size: 2rem;
       color: #ffffff;
       margin: 1rem 0;
-      animation: pulse 1.5s infinite;
+      animation: bounce 1s infinite alternate;
+      transition: color 0.3s, text-shadow 0.3s;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
     }
 
     .controls {
@@ -84,6 +84,7 @@
       text-align: center;
       font-size: 1rem;
       animation: fadeIn 2s ease;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
     }
 
     button {
@@ -107,12 +108,49 @@
       color: #ffffff;
       margin-top: 10px;
       animation: fadeIn 2s ease;
+      transition: color 0.3s;
     }
 
-    .dark-mode body { background: #0f2027; }
+    /* Top buttons */
+    #darkModeBtn, #notifyBtn {
+      position: absolute;
+      top: 20px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      color: white;
+      transition: background 0.3s, color 0.3s;
+    }
+    #darkModeBtn { right: 20px; background: linear-gradient(45deg, #444, #222); }
+    #notifyBtn { left: 20px; background: linear-gradient(45deg, #444, #222); }
+
+    /* Dark mode */
+    .dark-mode {
+      background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e) !important;
+      color: #fff;
+      animation: darkBgAnimation 30s ease-in-out infinite alternate;
+    }
+    .dark-mode .container { background: rgba(0,0,0,0.6); }
+    .dark-mode input[type="number"] { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 0 5px #00f0ff50; }
+    .dark-mode button { background: linear-gradient(45deg, #555, #333); box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+    .dark-mode button:hover { background: linear-gradient(45deg, #333, #555); }
+    .dark-mode #darkModeBtn, .dark-mode #notifyBtn { background: linear-gradient(45deg, #555, #333); }
+    .dark-mode .timer { color: #00f0ff; text-shadow: 0 0 10px #00f0ff; }
+    .dark-mode h1 { color: #00e5ff; text-shadow: 0 0 8px #00e5ff; }
+    .dark-mode .status { color: #a0eaff; }
+
+    @keyframes darkBgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
   </style>
 </head>
 <body>
+  <button id="notifyBtn" onclick="requestNotification()">🔔 Notifications</button>
+  <button id="darkModeBtn" onclick="toggleDarkMode()">🌓 Dark Mode</button>
+
   <div class="container">
     <h1>💧 Water Reminder</h1>
     <div class="timer" id="timer">Set your reminder ⏰</div>
@@ -122,7 +160,6 @@
       <label>Seconds:<input type="number" id="seconds" min="1" value="30"></label>
       <button onclick="startReminder()">Start</button>
       <button id="stopBtn" onclick="stopAlarm()">Stop</button>
-      <button onclick="toggleDarkMode()">Dark Mode</button>
     </div>
     <div class="status" id="status"></div>
   </div>
@@ -130,6 +167,9 @@
   <audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto" loop></audio>
 
   <script>
+    // Load dark mode preference
+    if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+
     let reminderInterval, countdownInterval, nextReminderTime, activeNotification;
     const ringtone = document.getElementById("ringtone");
     const stopBtn = document.getElementById("stopBtn");
@@ -139,21 +179,19 @@
       let minutes = parseInt(document.getElementById('minutes').value) || 0;
       let seconds = parseInt(document.getElementById('seconds').value) || 0;
       let totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
-
-      if (totalMs <= 0) { alert("Please set a valid time!"); return; }
-      ringtone.play().then(() => { ringtone.pause(); ringtone.currentTime = 0; });
+      if(totalMs <= 0){ alert("Please set a valid time!"); return; }
+      ringtone.pause(); ringtone.currentTime = 0;
       clearInterval(reminderInterval);
       clearInterval(countdownInterval);
       document.getElementById('status').innerText = `Reminder set for every ${hours}h ${minutes}m ${seconds}s.`;
-      if (Notification.permission !== "granted") Notification.requestPermission();
+      if(Notification.permission !== "granted") Notification.requestPermission();
 
-      function triggerReminder() {
+      function triggerReminder(){
         stopAlarm();
         ringtone.currentTime = 0;
         ringtone.play();
         stopBtn.style.display = "inline-block";
-
-        if (Notification.permission === "granted") {
+        if(Notification.permission === "granted"){
           activeNotification = new Notification("💧 Time to drink water!", {
             body: "Click to stop the alarm.",
             icon: "https://cdn-icons-png.flaticon.com/512/2913/2913465.png"
@@ -167,35 +205,48 @@
       startCountdown(totalMs);
     }
 
-    function startCountdown(duration) {
+    function startCountdown(duration){
       nextReminderTime = Date.now() + duration;
       updateCountdown();
-      countdownInterval = setInterval(updateCountdown, 1000);
+      countdownInterval = setInterval(updateCountdown,1000);
     }
 
-    function updateCountdown() {
+    function updateCountdown(){
       let remaining = nextReminderTime - Date.now();
-      if (remaining <= 0) {
+      if(remaining <= 0){
         clearInterval(countdownInterval);
         document.getElementById('timer').innerText = "Next reminder: soon!";
         document.title = "💧 Drink Water Now!";
         return;
       }
-      let seconds = Math.floor((remaining / 1000) % 60);
-      let minutes = Math.floor((remaining / 1000 / 60) % 60);
-      let hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+      let seconds = Math.floor((remaining/1000)%60);
+      let minutes = Math.floor((remaining/1000/60)%60);
+      let hours = Math.floor((remaining/(1000*60*60))%24);
       document.getElementById('timer').innerText = `Next reminder in ${hours}h ${minutes}m ${seconds}s.`;
       document.title = `💧 ${hours}h ${minutes}m ${seconds}s left`;
     }
 
-    function stopAlarm() {
+    function stopAlarm(){
       ringtone.pause();
       ringtone.currentTime = 0;
       stopBtn.style.display = "none";
-      if (activeNotification) activeNotification.close();
+      if(activeNotification) activeNotification.close();
     }
 
-    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    function requestNotification(){
+      if(Notification.permission !== "granted"){
+        Notification.requestPermission().then(permission=>{
+          alert(permission==="granted"?"Notifications enabled!":"Notifications denied!");
+        });
+      } else {
+        alert("Notifications already granted.");
+      }
+    }
   </script>
 </body>
 </html>
