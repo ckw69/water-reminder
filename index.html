@@ -1,229 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Water Reminder</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Water Reminder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to bottom, #1e3c72, #2a5298);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      overflow: hidden;
-      animation: bgAnimation 20s ease-in-out infinite alternate;
-      transition: background 0.3s, color 0.3s;
-    }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  color: #fff;
+}
 
-    @keyframes bgAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+.container {
+  background: #111;
+  border-radius: 25px;
+  padding: 2rem 3rem;
+  width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(15px);
-      border-radius: 25px;
-      padding: 2rem 3rem;
-      width: 900px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      animation: fadeIn 2s ease;
-      position: relative;
-      transition: background 0.3s;
-    }
+h1 {
+  font-size: 3rem;
+  color: #0ff;
+  text-shadow: 0 0 8px #0ff;
+  margin: 0;
+}
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.timer {
+  font-size: 2rem;
+  color: #0ff;
+  margin: 1rem 0;
+  animation: bounce 1s infinite alternate;
+  text-shadow: 0 0 10px #0ff;
+}
 
-    h1 {
-      font-size: 3rem;
-      color: #00f0ff;
-      margin: 0;
-      transition: color 0.3s, text-shadow 0.3s;
-    }
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
 
-    .timer {
-      font-size: 2rem;
-      color: #ffffff;
-      margin: 1rem 0;
-      animation: bounce 1s infinite alternate;
-      transition: color 0.3s, text-shadow 0.3s;
-    }
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
 
-    @keyframes bounce {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
+input[type="number"] {
+  width: 70px;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  background: #222;
+  color: #0ff;
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
+button {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #fff;
+  background: #333;
+  box-shadow: 0 2px 6px rgba(0,255,255,0.3);
+  transition: all 0.3s;
+}
 
-    input[type="number"] {
-      width: 70px;
-      padding: 0.5rem;
-      border-radius: 10px;
-      border: none;
-      text-align: center;
-      font-size: 1rem;
-      animation: fadeIn 2s ease;
-      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-    }
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #0ff;
+}
 
-    button {
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(45deg, #00bfff, #0077cc);
-      transition: all 0.3s, box-shadow 0.3s;
-      animation: fadeIn 2s ease;
-    }
+#stopBtn { background: #f00; display: none; }
+#stopAllBtn { background: #ff8800; }
 
-    button:hover { 
-      background: linear-gradient(45deg, #0077cc, #00bfff); 
-      transform: scale(1.05); 
-    }
-
-    #stopBtn { background: linear-gradient(45deg, #ff4c4c, #cc0000); display: none; }
-
-    .status {
-      font-size: 1.2rem;
-      color: #ffffff;
-      margin-top: 10px;
-      animation: fadeIn 2s ease;
-      transition: color 0.3s, text-shadow 0.3s;
-    }
-
-    /* Top buttons */
-    #darkModeBtn, #notifyBtn {
-      position: absolute;
-      top: 20px;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      color: white;
-      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-    }
-    #darkModeBtn { right: 20px; background: #222; }
-    #notifyBtn { left: 20px; background: #222; }
-
-    /* Dark mode - 100% black */
-    .dark-mode {
-      background: #000 !important;
-      color: #fff;
-      animation: none;
-    }
-    .dark-mode .container { background: #111; }
-    .dark-mode input[type="number"] { background: #222; color: #0ff; box-shadow: 0 0 5px #0ff50; }
-    .dark-mode button { 
-      background: #333; 
-      box-shadow: 0 2px 6px rgba(0,255,255,0.3);
-    }
-    .dark-mode button:hover { 
-      background: #555; 
-      transform: scale(1.05); 
-      box-shadow: 0 0 15px #0ff; 
-    }
-    .dark-mode #darkModeBtn:hover, .dark-mode #notifyBtn:hover {
-      box-shadow: 0 0 12px #0ff;
-    }
-    .dark-mode #darkModeBtn, .dark-mode #notifyBtn { background: #222; }
-    .dark-mode .timer { color: #0ff; text-shadow: 0 0 10px #0ff; }
-    .dark-mode h1 { color: #0ff; text-shadow: 0 0 8px #0ff; }
-    .dark-mode .status { color: #0ff; }
-
-  </style>
+.status {
+  font-size: 1.2rem;
+  color: #0ff;
+  margin-top: 10px;
+}
+</style>
 </head>
 <body>
-  <button id="notifyBtn" onclick="requestNotification()">🔔 Notifications</button>
-  <button id="darkModeBtn" onclick="toggleDarkMode()">🌓 Dark Mode</button>
-
-  <div class="container">
-    <h1>💧 Water Reminder</h1>
-    <div class="timer" id="timer">Set your reminder ⏰</div>
-    <div class="controls">
-      <label>Hours:<input type="number" id="hours" min="0" value="0"></label>
-      <label>Minutes:<input type="number" id="minutes" min="0" value="0"></label>
-      <label>Seconds:<input type="number" id="seconds" min="1" value="30"></label>
-      <button onclick="startReminder()">Start</button>
-      <button id="stopBtn" onclick="stopAlarm()">Stop</button>
-    </div>
-    <div class="status" id="status"></div>
+<div class="container">
+  <h1>💧 Water Reminder</h1>
+  <div class="timer" id="timer">Set your reminder ⏰</div>
+  <div class="controls">
+    <label>Hours:<input type="number" id="hours" min="0" value="0"></label>
+    <label>Minutes:<input type="number" id="minutes" min="0" value="0"></label>
+    <label>Seconds:<input type="number" id="seconds" min="1" value="30"></label>
+    <button onclick="startReminder()">Start</button>
+    <button id="stopBtn" onclick="stopAlarm()">Stop Alarm</button>
+    <button id="stopAllBtn" onclick="stopAll()">Stop Timer</button>
   </div>
+  <div class="status" id="status"></div>
+</div>
 
-  <audio id="ringtone" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto" loop></audio>
+<audio id="ringtone" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto" loop volume="1.5"></audio>
 
-  <script>
-    // Load dark mode preference
-    if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+<script>
+let reminderInterval, countdownInterval, nextReminderTime, activeNotification;
+const ringtone = document.getElementById("ringtone");
+const stopBtn = document.getElementById("stopBtn");
 
-    let reminderInterval, countdownInterval, nextReminderTime, activeNotification;
-    const ringtone = document.getElementById("ringtone");
-    const stopBtn = document.getElementById("stopBtn");
+function startReminder() {
+  let hours = parseInt(document.getElementById('hours').value) || 0;
+  let minutes = parseInt(document.getElementById('minutes').value) || 0;
+  let seconds = parseInt(document.getElementById('seconds').value) || 0;
+  let totalMs = (hours*3600 + minutes*60 + seconds) * 1000;
+  if(totalMs <= 0){ alert("Please set a valid time!"); return; }
+  ringtone.pause(); ringtone.currentTime = 0;
+  clearInterval(reminderInterval);
+  clearInterval(countdownInterval);
+  document.getElementById('status').innerText = `Reminder set for every ${hours}h ${minutes}m ${seconds}s.`;
 
-    function startReminder() {
-      let hours = parseInt(document.getElementById('hours').value) || 0;
-      let minutes = parseInt(document.getElementById('minutes').value) || 0;
-      let seconds = parseInt(document.getElementById('seconds').value) || 0;
-      let totalMs = (hours * 3600 + minutes * 60 + seconds) * 1000;
-      if(totalMs <= 0){ alert("Please set a valid time!"); return; }
-      ringtone.pause(); ringtone.currentTime = 0;
-      clearInterval(reminderInterval);
-      clearInterval(countdownInterval);
-      document.getElementById('status').innerText = `Reminder set for every ${hours}h ${minutes}m ${seconds}s.`;
-      if(Notification.permission !== "granted") Notification.requestPermission();
+  function triggerReminder(){
+    stopAlarm();
+    ringtone.currentTime = 0;
+    ringtone.volume = 1.5;
+    ringtone.play();
+    stopBtn.style.display = "inline-block";
+  }
 
-      function triggerReminder(){
-        stopAlarm();
-        ringtone.currentTime = 0;
-        ringtone.play();
-        stopBtn.style.display = "inline-block";
-        if(Notification.permission === "granted"){
-          activeNotification = new Notification("💧 Time to drink water!", {
-            body: "Click to stop the alarm.",
-            icon: "https://cdn-icons-png.flaticon.com/512/2913/2913465.png"
-          });
-          activeNotification.onclick = () => { stopAlarm(); activeNotification.close(); };
-        } else { alert("💧 Time to drink water!"); }
-        startCountdown(totalMs);
-      }
+  reminderInterval = setInterval(triggerReminder, totalMs);
+  startCountdown(totalMs);
+}
 
-      reminderInterval = setInterval(triggerReminder, totalMs);
-      startCountdown(totalMs);
-    }
+function startCountdown(duration){
+  nextReminderTime = Date.now() + duration;
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown,1000);
+}
 
-    function startCountdown(duration){
-      nextReminderTime = Date.now() + duration;
-      updateCountdown();
-      countdownInterval = setInterval(updateCountdown,1000);
-    }
+function updateCountdown(){
+  let remaining = nextReminderTime - Date.now();
+  if(remaining <= 0){
+    clearInterval(countdownInterval);
+    document.getElementById('timer').innerText = "Next reminder: soon!";
+    return;
+  }
+  let s = Math.floor((remaining/1000)%60);
+  let m = Math.floor((remaining/1000/60)%60);
+  let h = Math.floor((remaining/(1000*60*60))%24);
+  document.getElementById('timer').innerText = `Next reminder in ${h}h ${m}m ${s}s.`;
+}
 
-    function updateCountdown(){
-      let remaining = nextReminderTime - Date.now();
-      if(remaining <= 0){
-        clearInterval(countdownInterval);
-        document.getElementById('timer').innerText = "Next reminder: soon!";
-        document.title = "💧 Drink Water Now!";
-        return;
-      }
-      let seconds = Math.floor((remaining/1000
+function stopAlarm(){
+  ringtone.pause();
+  ringtone.currentTime = 0;
+  stopBtn.style.display = "none";
+}
+
+function stopAll(){
+  clearInterval(reminderInterval);
+  clearInterval(countdownInterval);
+  stopAlarm();
+  document.getElementById('timer').innerText = "Timer stopped.";
+  document.getElementById('status').innerText = "";
+}
+</script>
+</body>
+</html>
