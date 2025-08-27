@@ -5,97 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Water Reminder</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-body {
-  font-family: 'Roboto', sans-serif;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  overflow: hidden;
-  color: #fff;
-}
-
-.container {
-  background: #111;
-  border-radius: 25px;
-  padding: 2rem 3rem;
-  width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-h1 {
-  font-size: 3rem;
-  color: #0ff;
-  text-shadow: 0 0 8px #0ff;
-  margin: 0;
-}
-
-.timer {
-  font-size: 2rem;
-  color: #0ff;
-  margin: 1rem 0;
-  animation: bounce 1s infinite alternate;
-  text-shadow: 0 0 10px #0ff;
-}
-
-@keyframes bounce {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-}
-
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-input[type="number"] {
-  width: 70px;
-  padding: 0.5rem;
-  border-radius: 10px;
-  border: none;
-  text-align: center;
-  font-size: 1rem;
-  background: #222;
-  color: #0ff;
-}
-
-button {
-  padding: 0.7rem 1.5rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  color: #fff;
-  background: #333;
-  box-shadow: 0 2px 6px rgba(0,255,255,0.3);
-  transition: all 0.3s;
-}
-
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #0ff;
-}
-
-#stopBtn { background: #f00; display: none; }
-#stopAllBtn { background: #ff8800; }
-
-.status {
-  font-size: 1.2rem;
-  color: #0ff;
-  margin-top: 10px;
-}
+body { font-family: 'Roboto', sans-serif; background:#000; color:#0ff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+.container { background:#111; border-radius:25px; padding:2rem 3rem; width:900px; text-align:center; }
+h1 { font-size:3rem; text-shadow:0 0 8px #0ff; margin:0; }
+.timer { font-size:2rem; margin:1rem 0; animation:bounce 1s infinite alternate; text-shadow:0 0 10px #0ff; }
+@keyframes bounce { 0%{transform:translateY(0);}50%{transform:translateY(-10px);}100%{transform:translateY(0);} }
+.controls { display:flex; justify-content:center; align-items:center; gap:15px; flex-wrap:wrap; margin-top:20px; }
+input[type="number"]{ width:70px; padding:0.5rem; border-radius:10px; border:none; text-align:center; font-size:1rem; background:#222; color:#0ff; }
+button{ padding:0.7rem 1.5rem; font-size:1rem; border:none; border-radius:12px; cursor:pointer; color:#fff; background:#333; box-shadow:0 2px 6px rgba(0,255,255,0.3); transition:all 0.3s; }
+button:hover{ transform:scale(1.05); box-shadow:0 0 15px #0ff; }
+#stopBtn{ background:#f00; display:none; }
+#stopAllBtn{ background:#ff8800; }
+.status{ font-size:1.2rem; color:#0ff; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -113,67 +34,82 @@ button:hover {
   <div class="status" id="status"></div>
 </div>
 
-<audio id="ringtone" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto" loop volume="1.5"></audio>
+<audio id="ringtone" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
 
 <script>
-let reminderInterval, countdownInterval, nextReminderTime, activeNotification;
+let reminderInterval, countdownInterval, nextReminderTime;
 const ringtone = document.getElementById("ringtone");
 const stopBtn = document.getElementById("stopBtn");
 
-function startReminder() {
-  let hours = parseInt(document.getElementById('hours').value) || 0;
-  let minutes = parseInt(document.getElementById('minutes').value) || 0;
-  let seconds = parseInt(document.getElementById('seconds').value) || 0;
-  let totalMs = (hours*3600 + minutes*60 + seconds) * 1000;
-  if(totalMs <= 0){ alert("Please set a valid time!"); return; }
-  ringtone.pause(); ringtone.currentTime = 0;
-  clearInterval(reminderInterval);
-  clearInterval(countdownInterval);
-  document.getElementById('status').innerText = `Reminder set for every ${hours}h ${minutes}m ${seconds}s.`;
-
-  function triggerReminder(){
-    stopAlarm();
-    ringtone.currentTime = 0;
-    ringtone.volume = 1.5;
-    ringtone.play();
-    stopBtn.style.display = "inline-block";
+function requestNotificationPermission() {
+  if(Notification.permission !== "granted") {
+    Notification.requestPermission();
   }
-
-  reminderInterval = setInterval(triggerReminder, totalMs);
-  startCountdown(totalMs);
 }
 
-function startCountdown(duration){
-  nextReminderTime = Date.now() + duration;
+function startReminder(){
+  requestNotificationPermission();
+
+  let h = parseInt(document.getElementById('hours').value)||0;
+  let m = parseInt(document.getElementById('minutes').value)||0;
+  let s = parseInt(document.getElementById('seconds').value)||0;
+  let totalMs = (h*3600 + m*60 + s)*1000;
+
+  if(totalMs <= 0){ alert("Please set a valid time!"); return; }
+
+  clearInterval(reminderInterval);
+  clearInterval(countdownInterval);
+  stopAlarm();
+  document.getElementById('status').innerText = `Reminder set for every ${h}h ${m}m ${s}s.`;
+
+  nextReminderTime = Date.now() + totalMs;
   updateCountdown();
-  countdownInterval = setInterval(updateCountdown,1000);
+  countdownInterval = setInterval(updateCountdown, 1000);
+
+  reminderInterval = setTimeout(triggerReminder, totalMs); // single alarm
+}
+
+function triggerReminder(){
+  ringtone.currentTime=0;
+  ringtone.volume=1.0;
+  ringtone.play();
+  stopBtn.style.display="inline-block";
+
+  if(Notification.permission === "granted"){
+    new Notification("💧 Time to drink water!", {
+      body:"Click Stop Alarm to silence.",
+      icon:"https://cdn-icons-png.flaticon.com/512/2913/2913465.png"
+    });
+  } else {
+    alert("💧 Time to drink water!");
+  }
 }
 
 function updateCountdown(){
   let remaining = nextReminderTime - Date.now();
-  if(remaining <= 0){
+  if(remaining <=0){ 
     clearInterval(countdownInterval);
-    document.getElementById('timer').innerText = "Next reminder: soon!";
+    document.getElementById('timer').innerText="Next reminder: now!";
     return;
   }
   let s = Math.floor((remaining/1000)%60);
   let m = Math.floor((remaining/1000/60)%60);
   let h = Math.floor((remaining/(1000*60*60))%24);
-  document.getElementById('timer').innerText = `Next reminder in ${h}h ${m}m ${s}s.`;
+  document.getElementById('timer').innerText=`Next reminder in ${h}h ${m}m ${s}s.`;
 }
 
 function stopAlarm(){
   ringtone.pause();
-  ringtone.currentTime = 0;
-  stopBtn.style.display = "none";
+  ringtone.currentTime=0;
+  stopBtn.style.display="none";
 }
 
 function stopAll(){
-  clearInterval(reminderInterval);
+  clearTimeout(reminderInterval);
   clearInterval(countdownInterval);
   stopAlarm();
-  document.getElementById('timer').innerText = "Timer stopped.";
-  document.getElementById('status').innerText = "";
+  document.getElementById('timer').innerText="Timer stopped.";
+  document.getElementById('status').innerText="";
 }
 </script>
 </body>
